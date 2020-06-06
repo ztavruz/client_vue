@@ -86,22 +86,23 @@
                     <div @click="choise()" data-sum="25000" class="button1 ">ВОЙТИ</div>
                 </div>
 
-                <form id="interkassa" name="payment" method="post" action="https://sci.interkassa.com/" accept-charset="UTF-8">
-                    <input type="hidden" name="ik_co_id" value="51237daa8f2a2d8413000000"/>
-                    <input id="label"  type="hidden" name="ik_pm_no" value=""/>
-                    <input id="sum" type="hidden" name="ik_am" value=""/>
-                    <input type="hidden" name="ik_cur" value="RUB"/>
-                    <input type="hidden" name="ik_desc" value="БИЛЕТ в ЖИЗНЬ"/>
-                </form>
-
-<!--                <form id="ya_form" method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">-->
-<!--                    <input id="receiver" type="hidden" name="receiver" value="410014728468421">-->
-<!--                    <input id="label" type="hidden" name="label" value="">-->
-<!--                    <input id="quickpay-form" type="hidden" name="quickpay-form" value="donate">-->
-<!--                    <input id="targets" type="hidden" name="targets" value="Взнос">-->
-<!--                    <input id="sum" type="hidden" name="sum" value="" data-type="number">-->
-<!--                    <input id="pc" type="radio" name="paymentType" value="PC">-->
+<!--                <form id="interkassa" name="payment" method="post" action="https://sci.interkassa.com/" accept-charset="UTF-8">-->
+<!--                    <input type="hidden" name="s" value="8L8hRzeXOH" />-->
+<!--                    <input type="hidden" name="ik_co_id" value="5ea0ac481ae1bd2f008b4568"/>-->
+<!--                    <input id="label"  type="hidden" name="ik_pm_no" value=""/>-->
+<!--                    <input id="sum" type="hidden" name="ik_am" value=""/>-->
+<!--                    <input type="hidden" name="ik_cur" value="RUB"/>-->
+<!--                    <input type="hidden" name="ik_desc" value="БИЛЕТ в ЖИЗНЬ"/>-->
 <!--                </form>-->
+
+                <form id="yandexPay" method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">
+                    <input id="receiver" type="hidden" name="receiver" value="410014728468421">
+                    <input id="label" type="hidden" name="label" value="">
+                    <input id="quickpay-form" type="hidden" name="quickpay-form" value="donate">
+                    <input id="targets" type="hidden" name="targets" value="Взнос">
+                    <input id="sum" type="hidden" name="sum" value="" data-type="number">
+                    <input id="pc" type="radio" name="paymentType" value="PC">
+                </form>
             </div>
         </div>
 
@@ -122,7 +123,7 @@
         },
         methods: {
 
-            choise() {
+            async choise() {
 
                 let item = function (id) {
                     return document.getElementById(id);
@@ -136,25 +137,23 @@
                 }
                 prepareFd = JSON.stringify(prepareFd);
 
-                console.log(prepareFd)
                 let fd = new FormData();
                 fd.append("pay", prepareFd)
 
-                this.axios.post(this.combatUrl + "/api/payRegister", fd, {
+                let data = await this.axios.post(this.combatUrl + "/api/payRegister", fd, {
                     headers: {
                         'Content-Type': ' multipart/form-data',
                     }
-                })
-                    .then(function (response) {
+                }).then(function (response) {
                         let data = response.data;
-                        data = JSON.stringify(data);
-                        data = JSON.parse(data);
+
                         console.log(data)
                         item('label').value = data.timePoint;
                         item('sum').value = data.sum;
 
                     }).then(() => {
-                    item('interkassa').submit();
+                    item('yandexPay').submit();
+                    // item('interkassa').submit();
                 })
 
             },
